@@ -1,0 +1,53 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: choicemodel-ing
+spec:
+  backend:
+    serviceName: choicemodel
+    servicePort: 5000
+---           
+apiVersion: v1
+kind: Service
+metadata:
+  name: choicemodel
+  labels:
+    app: choicemodel
+spec:
+  type: NodePort  
+  ports:
+  - name: "server"
+    port: 5000
+  selector:
+    app: choicemodel
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  labels:
+    app: choicemodel
+  name: choicemodel
+spec:
+  serviceName: choicemodel
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: choicemodel
+    spec:
+      containers:
+      - env:
+          - name: FAKE_VALUE
+            value: 
+        image: mytrac/choices-model-api:alpha
+        imagePullPolicy: Always
+        name: choicemodel
+        ports:
+        - containerPort: 5000
+          #        readinessProbe:
+          #            httpGet: 
+          #                path:  /choice/help
+          #                port: 5000
+          #            initialDelaySeconds: 30
+          #            timeoutSeconds: 1
+      restartPolicy: Always

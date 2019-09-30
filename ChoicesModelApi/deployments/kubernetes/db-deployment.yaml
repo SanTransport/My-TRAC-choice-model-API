@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    app: db
+spec:
+
+  ports:
+  - name: "server"
+    port: 7777
+    targetPort: 3306
+  clusterIP: None  
+  selector:
+    app: db
+status:
+  loadBalancer: {}
+--- 
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  labels:
+    app: db
+  name: db
+spec:
+  serviceName: db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "no"
+        - name: MYSQL_DATABASE
+          value: mytrac_model_module
+        - name: MYSQL_PASSWORD
+          value: U6LB5VUCBBcXdmu6
+        - name: MYSQL_ROOT_PASSWORD
+          value: U6LB5VUCBBcXdmu6
+        - name: MYSQL_USER
+          value: root
+        image: mariadb:10.3.16
+        name: db
+        ports:
+        - containerPort: 3306
+        resources: {}
+      restartPolicy: Always
+status: {}

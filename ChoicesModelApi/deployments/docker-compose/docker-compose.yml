@@ -1,0 +1,22 @@
+version: "2"
+services:
+  db:
+    image: mariadb:10.3.16
+    ports:
+      - "7777:3306"
+    expose:
+      - "3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "U6LB5VUCBBcXdmu6"
+      MYSQL_DATABASE: "mytrac_model_module"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "U6LB5VUCBBcXdmu6"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+  app:
+    image: mytrac/choices-model-api:alpha
+    links:
+      - db
+    ports:
+      - "5000:5000"
+    expose:
+      - "5000"
