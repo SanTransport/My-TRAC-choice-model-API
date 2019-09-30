@@ -2,7 +2,7 @@
 
 Breakdown of the various variables of the query string:
 
-- http://<ip_of_the_api>:5000/choice/mode/?
+**http://<ip_of_the_api>:5000/choice/mode/?**
 - user_country=	{ES, GR, NL, PT}	e.g.: NL
 - trip_dur_car=	{from OTP: trip duration by car (in minutes)}	e.g.: 20
 - trip_dur_pt=	{from OTP: trip duration by pt (in minutes)}	e.g.: 45
@@ -29,6 +29,7 @@ Breakdown of the various variables of the query string:
 - mytrac_id=	{long}		e.g.: 765
 
 ** for the NL model, use the _bike variables instead of the _moto variables.
+* variables that appear with a different name at https://github.com/My-TRAC/data-model
 
 The model may be queried at http://35.190.118.92/choice/help/
 
