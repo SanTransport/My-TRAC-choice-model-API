@@ -29,6 +29,7 @@ Breakdown of the various variables of the query string:
 - mytrac_id=	{long}		e.g.: 765
 
 ** for the NL model, use the _bike variables instead of the _moto variables.
+
 \* variables that appear with a different name at https://github.com/My-TRAC/data-model
 
 The model may be queried at http://35.190.118.92/choice/help/
