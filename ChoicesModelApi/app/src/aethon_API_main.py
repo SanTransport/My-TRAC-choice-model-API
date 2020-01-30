@@ -4,16 +4,18 @@ import pandas as pd
 import time
 import time_of_departure_model  # Import the Time of Departure main Class
 import mode_choice_model  # Import the Mode Choice main Class
+import route_choice_model # Import the Route Choice main Class
 TOD = time_of_departure_model.TimeOfDeparture()  # Create an instance of the Class.
 MOD = mode_choice_model.ModeChoice()  # Create an instance of the Class.
+ROU = route_choice_model.RouteChoice() # Create an instance of the Class.
 
 app = Flask(__name__)
 
 # Init Variables
-dbhost = 'db'  # Fixme change to 'db' when in operational environment
-dbuser = 'root'
-dbpassword = 'U6LB5VUCBBcXdmu6'
-dbdb = 'mytrac_model_module'
+dbhost = '_'  # Fixme change to 'db' when in operational environment
+dbuser = '_'
+dbpassword = '_'
+dbdb = '_'
 
 # Create a Model class to store all models inside it
 class Model:
@@ -22,6 +24,7 @@ class Model:
 
 MODEL_TOD = Model()  # the MODEL_TOD variable will have an attribute for each country
 MODEL_MOD = Model()  # the MODEL_MOD variable will have an attribute for each country
+MODEL_ROU = Model()  # the MODEL_ROU variable will have an attribute for each country
 
 
 def __recommend(model_type):
@@ -55,6 +58,9 @@ def __recommend(model_type):
     elif model_type == 'MOD':
         model = MODEL_MOD
         lib = MOD
+    elif model_type == 'ROU':
+        model = MODEL_ROU
+        lib = ROU
     else:
         model = None
         lib = None
@@ -84,10 +90,13 @@ def __recommend(model_type):
 def tod_choice_predict():
     return __recommend('TOD')
 
-
 @app.route("/choice/mode/")
 def mode_choice():
     return __recommend('MOD')
+
+@app.route("/choice/route/")
+def route_choice():
+    return __recommend('ROU')
 
 
 @app.route("/choice/time-of-departure/estimate/")
@@ -106,7 +115,7 @@ def tod_choice_estimate():
         setattr(MODEL_TOD, arg_country, TOD.estimate_model(TOD.connect_to_db(dbdb, arg_country), arg_country))
         result = {'SUCCESS': f'The Time of Departure Model of {arg_country} has been successfully estimated.'}
     except:
-        result = {'FAIL': f'There is no Time of Departure Model for {arg_country}. Try (&country=XX, where XX=ES,GR,NL,PT)'}
+        result = {'FAIL': f'There is no Time of Departure Model for {arg_country}. Try (?user_country=XX, where XX=ES,GR,NL,PT)'}
     return jsonify(result)
 
 
@@ -126,9 +135,28 @@ def mode_choice_estimate():
         setattr(MODEL_MOD, arg_country, MOD.estimate_model(MOD.connect_to_db(dbdb, arg_country), arg_country))
         result = {'SUCCESS': f'The Mode Choice Model of {arg_country} has been successfully estimated.'}
     except:
-        result = {'FAIL': f'There is no Mode Choice Model for {arg_country}. Try &country=XX, where XX=ES,GR,NL,PT.'}
+        result = {'FAIL': f'There is no Mode Choice Model for {arg_country}. Try ?user_country=XX, where XX=ES,GR,NL,PT.'}
     return jsonify(result)
 
+
+@app.route("/choice/route/estimate/")
+def route_choice_estimate():
+    '''
+    Function that estimates (aka trains) the model for the given country.
+    The country for which the model is to be estimated is passed through the URL query.
+    For example: ./choice/time-of-departure/estimate/?user_country=ES
+    Note, the models have to be estimated AT LEAST ONCE, before they can be used.
+    The initial training of the models is performed automatically early on, as soon as the main script is initiated.
+    The model is stored as an attribute within the MODEL variable, for example: MODEL_MOD.GR, MODEL_MOD.NL, etc.
+    :return: A JSON diagnostic response: { Status : Message }
+    '''
+    arg_country = request.args.get('user_country')  # parse arguments and get the country as input
+    try:
+        setattr(MODEL_ROU, arg_country, ROU.estimate_model(ROU.connect_to_db(dbdb, arg_country), arg_country))
+        result = {'SUCCESS': f'The Route Choice Model of {arg_country} has been successfully estimated.'}
+    except:
+        result = {'FAIL': f'There is no Route Choice Model for {arg_country}. Try ?user_country=XX, where XX=ES,GR,NL,PT.'}
+    return jsonify(result)
 
 @app.route("/")
 def tod_choice_root():
@@ -138,11 +166,11 @@ def tod_choice_root():
 def tod_choice_help():
     help_tip = {'Choice Model API status': 'OK'}
     return jsonify(help_tip)
-
-
+#gdgfd
+#%% Main
 if __name__ == "__main__":
     '''
-    Train all models and store them in MODEL_TOD and MODEL_MOD.
+    Train all models and store them in MODEL_TOD, MODEL_MOD, and MODEL_ROU.
     Then start the API service at 0.0.0.0.
     '''
     # First time run should be that the database is empty
@@ -176,4 +204,10 @@ if __name__ == "__main__":
         # for beta, value in getattr(MODEL_MOD, country).betas.items():
         #     print(beta, "\t%.3f" % value)
 
+        setattr(MODEL_ROU, country, ROU.estimate_model(ROU.connect_to_db(dbdb, country), country))
+        # print('Route Choice BETAS for country: ', country)
+        # for beta, value in getattr(MODEL_ROU, country).betas.items():
+        #     print(beta, "\t%.3f" % value)
+
     app.run(host='0.0.0.0')
+    
