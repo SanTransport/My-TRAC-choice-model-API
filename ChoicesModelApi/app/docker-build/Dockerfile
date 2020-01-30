@@ -22,6 +22,7 @@ COPY src/database_connection.py /app
 COPY src/install_databases.py /app
 COPY src/mode_choice_model.py /app
 COPY src/time_of_departure_model.py /app
+COPY src/route_choice_model.py /app
 COPY src/mytrac_model_module.sql /app
 
 CMD python -u aethon_API_main.py
