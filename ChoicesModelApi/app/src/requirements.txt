@@ -4,3 +4,4 @@ mysql==0.0.2
 mysql-connector-python==8.0.17
 numpy==1.16.2
 Unidecode==1.1.1
+json==2.0.9
