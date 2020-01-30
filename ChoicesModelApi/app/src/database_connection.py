@@ -2,11 +2,9 @@ import mysql.connector
 from mysql.connector import Error
 from aethon_API_main import dbhost, dbuser, dbpassword
 
-
 class DatabaseConnection:
     def __init__(self, database_name, host=dbhost, user=dbuser, password=dbpassword):
         """The class for connecting and running operations on a MySQL database.
-
         :param string database_name: Is the name of the database we are connecting to
         :param string host: Is the name of the database's host
         :param string user: Is the name of the user that is connecting to the database (login name)
@@ -68,7 +66,6 @@ class DatabaseConnection:
     def run_query(self, query_to_execute, arguments):
         """The function for running a query. The query is inserted as a function (use the class' functions as input
         depending on what you want to do, e.g., insert data or get data)
-
         :param callable query_to_execute: A query, as defined in this variable, is executed
         :param dict or string arguments: Dict_The arguments for running the query should contain the inputs per the function inserted in query_to_execute / String_The string of a custom query
         """
@@ -118,7 +115,6 @@ class DatabaseConnection:
 
     def custom_query(self, query):
         """A function that executes a custom query immediately without performing any parsing
-
         :param string query: The query to execute
         :return: none
         """
@@ -128,7 +124,6 @@ class DatabaseConnection:
     def insert_data(self, arguments):
         """This function is used to insert data in a table. It creates the input for the cursor.execute function by manipulating the arguments and then executes the query.
         For more info on operations of the function, see here: https://dev.mysql.com/doc/connector-python/en/connector-python-example-cursor-transaction.html
-
         :param dict arguments: The arguments for running the query. Arguments here are: table_name / columns / data. Check create_template_arguments for more info
         :return: none
         """
@@ -155,7 +150,6 @@ class DatabaseConnection:
     def update_row(self, arguments):
         """This function is used to update a single row in a table. It creates the input for the cursor.execute function by manipulating the arguments and
         executes the query. Best use the primary key for the where clause. For more info on operations of the function, see here: http://www.mysqltutorial.org/python-mysql-update/
-
         :param dict arguments: The arguments for running the query. Arguments here are: table_name / columns / data / where_cols / where_values. Check create_template_arguments for more info
         :return: none
         """
@@ -182,7 +176,6 @@ class DatabaseConnection:
     def select_data(self, arguments):
         """This function is used for selecting a single row and return the data specified in arguments input (columns). It creates the input for the
         cursor.execute function by manipulating the arguments and executes the query.
-
         :param dict arguments: The arguments for running the query. Arguments here are: table_name / columns / where_cols / where_values. Check create_template_arguments for more info
         :return: none (output is stored in class variable output)
         """
@@ -204,7 +197,6 @@ class DatabaseConnection:
 
     def __parse_selection(self, arguments):
         """Creates a dictionary that holds the data returned for SELECT queries. The keys are column names as they appear in the db
-
         :param dict arguments: The arguments for running the query and that was used in the select function
         :return dict: The output contains the column names (keys) and the data from the db (values)
         """
@@ -229,12 +221,13 @@ class DatabaseConnection:
 
     def __format_data_for_query(self, data):
         """Format the data as expected by the cursor
-
         :param list/tuple data: The data to be stored in the db
         :return tuple: The data in tuple as expected by the cursor
         """
         add_data = []
-        if type(data[0]) is list or type(data[0]) is tuple:     # That means we have multiple rows
+        if len(data)==0:
+            add_data=data
+        elif type(data[0]) is list or type(data[0]) is tuple:     # That means we have multiple rows
             if type(data[0]) is tuple and type(data) is list:   # In this case, we do not need to do any action since list(tuple()) is expected by the cursor
                 add_data = data
             else:           # Then we need to prepare the data in the list(tuple()) format
@@ -251,12 +244,13 @@ class DatabaseConnection:
 
     def __create_where_clause(self, arguments, force_variable = False):
         """Used for creating the where clause from the arguments input
-
         :param dict arguments: The arguments for running the query that were given by the user
         :return string: The where clause as a string
         """
         where_clause = 'WHERE '
-        if (len(arguments['where_cols']) == 1):
+        if (len(arguments['where_cols']) == 0):
+            where_clause = ''
+        elif (len(arguments['where_cols']) == 1):
             where_clause += arguments['where_cols'][0] + '=' + ('%s' if force_variable else arguments['where_values'][0])
         else:
             where_cols_len = len(arguments['where_cols'])
@@ -274,13 +268,11 @@ class DatabaseConnection:
     def create_template_arguments(self):
         """The function returns the arguments variable that is used in all functions that create the queries (e.g., see
         insert_data). Use it to obtain the input in the form expected by the functions
-
         Important:
         1. columns and data need to correspond (column 1 -> data 1, column 2-> data 2 etc.)
         2. if inserting data, the equivalent function can insert many rows in the table. To do that, you will need to
            insert many lists in the data list. E.g., 'data': [[data 1.1, data 1.2], [data 2.1, data 2.2]] will insert
            two lines in the table.
-
         :return dict: An empty arguments variable that is input for query creation functions of the class
         """
         arguments = {
