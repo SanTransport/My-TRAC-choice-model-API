@@ -12,7 +12,7 @@ http://localhost:5000/choice/route/?user_country=NL
 &user_birthday=19861224&user_gender=1&user_income=1&user_traveller_type=0&user_often_pt=2&trip_id=567&mytrac_id=765
 
 '''
-import database_connection
+import database_connection_route
 import pandas as pd
 import biogeme.database as db
 import biogeme.biogeme as bio
@@ -79,7 +79,7 @@ class RouteChoice:
         :return: a pandas db that is readable by biogeme
         """
         # connect to the database
-        sql = database_connection.DatabaseConnection(database_name)
+        sql = database_connection_route.DatabaseConnection(database_name)
         if country == 'ES':  # FIXME remove the workaround, once we have data for ES
             country = 'GR'
 
@@ -143,6 +143,7 @@ class RouteChoice:
             ]
         })
         userData = pd.DataFrame(data=sql.output).transpose()
+        
         userData = userData.loc[(userData['user_id']!=0)&(userData['user_birthday']!=0)] # remove invalid users and users with missing information
         
         # from birthday to age
