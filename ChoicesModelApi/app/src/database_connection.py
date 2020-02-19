@@ -1,6 +1,10 @@
 import mysql.connector
 from mysql.connector import Error
-from aethon_API_main import dbhost, dbuser, dbpassword
+#from aethon_API_main import dbhost, dbuser, dbpassword
+dbhost = 'localhost'  # Fixme change to 'db' when in operational environment
+dbuser = 'root'
+dbpassword = 'sanmay'
+dbdb = 'mytrac_model_module'
 
 class DatabaseConnection:
     def __init__(self, database_name, host=dbhost, user=dbuser, password=dbpassword):
