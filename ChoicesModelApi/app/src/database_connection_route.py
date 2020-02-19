@@ -2,10 +2,10 @@ import mysql.connector
 from mysql.connector import Error
 #from aethon_API_main import route_dbhost, route_dbuser, route_dbpassword
 
-route_dbhost = '35.189.241.175'
-route_dbuser = 'delft'
-route_dbpassword = 'X7iK3wNQ'
-route_dbdb = 'mytraclastshare'
+route_dbhost = ''
+route_dbuser = ''
+route_dbpassword = ''
+route_dbdb = ''
 
 
 class DatabaseConnection:

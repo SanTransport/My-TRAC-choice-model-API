@@ -17,9 +17,7 @@ app = Flask(__name__)
 #dbpassword = 'sanmay'
 dbdb = 'mytrac_model_module'
 
-#route_dbhost = '35.189.241.175'
-#route_dbuser = 'delft'
-#route_dbpassword = 'X7iK3wNQ'
+
 route_dbdb = 'mytraclastshare'
 
 # Create a Model class to store all models inside it
