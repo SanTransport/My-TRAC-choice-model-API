@@ -38,3 +38,6 @@
 The model may be queried at http://35.190.118.92/choice/help/
 
 The docker can be found here: https://hub.docker.com/r/mytrac/choices-model-api, in case you wish to deploy it locally.
+
+
+For route choice model; add My-TRAC database access information in My-TRAC-choice-model-API\ChoicesModelApi\app\src\database_connection_route.py
