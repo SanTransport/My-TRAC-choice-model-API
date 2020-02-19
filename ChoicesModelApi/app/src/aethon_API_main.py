@@ -12,10 +12,15 @@ ROU = route_choice_model.RouteChoice() # Create an instance of the Class.
 app = Flask(__name__)
 
 # Init Variables
-dbhost = '_'  # Fixme change to 'db' when in operational environment
-dbuser = '_'
-dbpassword = '_'
-dbdb = '_'
+#dbhost = 'localhost'  # Fixme change to 'db' when in operational environment
+#dbuser = 'root'
+#dbpassword = 'sanmay'
+dbdb = 'mytrac_model_module'
+
+#route_dbhost = '35.189.241.175'
+#route_dbuser = 'delft'
+#route_dbpassword = 'X7iK3wNQ'
+route_dbdb = 'mytraclastshare'
 
 # Create a Model class to store all models inside it
 class Model:
@@ -39,18 +44,19 @@ def __recommend(model_type):
     '''
 
     args_dict = request.args.to_dict()  # store all arguments in a dictionary
-
-    # Store input query (trip) in the database
-    try:
-        DC = database_connection.DatabaseConnection(database_name='mytrac_model_module')
-        DC.run_query(DC.insert_data, {
-            'table_name': model_type.lower()+'_requests',
-            'columns': list(args_dict.keys()),
-            'data': list(args_dict.values())
-        })
-    except:
-        print('Was not able to store the query into ', model_type.lower()+'_requests')
-        pass
+    
+    if (model_type=='TOD') | (model_type=='MOD'):
+        # Store input query (trip) in the database
+        try:
+            DC = database_connection.DatabaseConnection(database_name='mytrac_model_module')
+            DC.run_query(DC.insert_data, {
+                'table_name': model_type.lower()+'_requests',
+                'columns': list(args_dict.keys()),
+                'data': list(args_dict.values())
+            })
+        except:
+            print('Was not able to store the query into ', model_type.lower()+'_requests')
+            pass
 
     if model_type == 'TOD':
         model = MODEL_TOD
@@ -78,7 +84,7 @@ def __recommend(model_type):
 
     try:
         getattr(model, user_country)  # Check if the model for that country code exists
-    except NameError:
+    except:
         prediction = f'The model of {user_country} has not been trained yet'  # If the model doesn't exist, catch exception
     else:
         prediction = lib.predict(sample_trip_data, getattr(model, user_country))  # Produce the recommendation.
@@ -152,10 +158,10 @@ def route_choice_estimate():
     '''
     arg_country = request.args.get('user_country')  # parse arguments and get the country as input
     try:
-        setattr(MODEL_ROU, arg_country, ROU.estimate_model(ROU.connect_to_db(dbdb, arg_country), arg_country))
+        setattr(MODEL_ROU, arg_country, ROU.estimate_model(ROU.connect_to_db(route_dbdb, arg_country), arg_country))
         result = {'SUCCESS': f'The Route Choice Model of {arg_country} has been successfully estimated.'}
     except:
-        result = {'FAIL': f'There is no Route Choice Model for {arg_country}. Try ?user_country=XX, where XX=ES,GR,NL,PT.'}
+        result = {'FAIL': f'There is no Route Choice Model for {arg_country}. Try ?user_country=XX, where XX=ES,GR,NL,PT. It is also possible that there is no data available for the defined country'}
     return jsonify(result)
 
 @app.route("/")
@@ -204,7 +210,10 @@ if __name__ == "__main__":
         # for beta, value in getattr(MODEL_MOD, country).betas.items():
         #     print(beta, "\t%.3f" % value)
 
-        setattr(MODEL_ROU, country, ROU.estimate_model(ROU.connect_to_db(dbdb, country), country))
+        try:
+            setattr(MODEL_ROU, country, ROU.estimate_model(ROU.connect_to_db(route_dbdb, country), country))
+        except:
+            print('There is no data for a Route Choice Model in ' + country)
         # print('Route Choice BETAS for country: ', country)
         # for beta, value in getattr(MODEL_ROU, country).betas.items():
         #     print(beta, "\t%.3f" % value)
